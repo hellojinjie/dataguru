@@ -24,7 +24,7 @@ public class IndependentIP {
     Configuration conf = new Configuration();
     String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
     if (otherArgs.length != 2) {
-      System.err.println("Usage: wordcount <in> <out>");
+      System.err.println("Usage: independentip <in> <out>");
       System.exit(2);
     }
     Job job = Job.getInstance(conf, "independent ip");
