@@ -34,8 +34,6 @@ public class PageView {
     job.setJarByClass(PageView.class);
     job.setMapperClass(PageViewMapper.class);
     job.setReducerClass(PageViewReducer.class);
-    job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(Text.class);
     job.setNumReduceTasks(1);
     FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
     FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));

@@ -16,7 +16,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-public class BytesLoaded {
+public class Referrals {
 
   public static void main(String[] args) throws Exception {
     Configuration conf = new Configuration();
@@ -26,9 +26,11 @@ public class BytesLoaded {
       System.exit(2);
     }
     Job job = Job.getInstance(conf, "page view");
-    job.setJarByClass(BytesLoaded.class);
+    job.setJarByClass(Referrals.class);
     job.setMapperClass(PageViewMapper.class);
     job.setReducerClass(PageViewReducer.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(Text.class);
     job.setNumReduceTasks(1);
     FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
     FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
