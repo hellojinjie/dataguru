@@ -34,10 +34,10 @@ public class IndependentIP {
     Job job = Job.getInstance(conf, "independent ip");
     job.setJarByClass(IndependentIP.class);
     job.setMapperClass(IndependentIPMapper.class);
-    job.setCombinerClass(IndependentIPReducer.class);
     job.setReducerClass(IndependentIPReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(Text.class);
+    job.setNumReduceTasks(1);
     FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
     FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
     System.exit(job.waitForCompletion(true) ? 0 : 1);           

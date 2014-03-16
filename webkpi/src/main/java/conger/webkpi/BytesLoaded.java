@@ -28,10 +28,10 @@ public class BytesLoaded {
     Job job = Job.getInstance(conf, "page view");
     job.setJarByClass(BytesLoaded.class);
     job.setMapperClass(PageViewMapper.class);
-    job.setCombinerClass(PageViewReducer.class);
     job.setReducerClass(PageViewReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(Text.class);
+    job.setNumReduceTasks(1);
     FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
     FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
     System.exit(job.waitForCompletion(true) ? 0 : 1);           
