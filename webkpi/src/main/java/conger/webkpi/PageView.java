@@ -11,7 +11,6 @@ import net.sf.uadetector.service.UADetectorServiceFactory;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -41,7 +40,7 @@ public class PageView {
     System.exit(job.waitForCompletion(true) ? 0 : 1);           
   }
 
-  public static class PageViewMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+  public static class PageViewMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     private Pattern pattern = Pattern
         .compile("([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*) ([^ \"]*|\"[^\"]*\") ([^ \"]*|\"[^\"]*\")");
@@ -49,7 +48,7 @@ public class PageView {
     private UserAgentStringParser uaParser = UADetectorServiceFactory.getCachingAndUpdatingParser();
 
     private Text emptyValue = new Text();
-    private IntWritable one = new IntWritable(1);
+    private Text one = new Text("" + 1);
 
     @Override
     public void map(LongWritable key, Text value, Context context) throws java.io.IOException,
@@ -80,18 +79,17 @@ public class PageView {
     }
   }
 
-  public static class PageViewReducer extends Reducer<Text, IntWritable, Text, Text> {
+  public static class PageViewReducer extends Reducer<Text, Text, Text, Text> {
 
     private Text emptyText = new Text();
     private int totalView = 0;
     
     @Override
-    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+    public void reduce(Text key, Iterable<Text> values, Context context)
         throws java.io.IOException, InterruptedException {
-      Iterator<IntWritable> iter = values.iterator();
+      Iterator<Text> iter = values.iterator();
       while (iter.hasNext()) {
-        IntWritable t = iter.next();
-        totalView += t.get();
+        totalView++;
       }
       context.write(emptyText, new Text("" + totalView));
       System.out.println(totalView);
