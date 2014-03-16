@@ -1,12 +1,12 @@
 package conger.webkpi;
 
+import java.net.URL;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -27,8 +27,8 @@ public class Referrals {
     }
     Job job = Job.getInstance(conf, "page view");
     job.setJarByClass(Referrals.class);
-    job.setMapperClass(PageViewMapper.class);
-    job.setReducerClass(PageViewReducer.class);
+    job.setMapperClass(ReferralsMapper.class);
+    job.setReducerClass(ReferralsReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(Text.class);
     job.setNumReduceTasks(1);
@@ -37,13 +37,13 @@ public class Referrals {
     System.exit(job.waitForCompletion(true) ? 0 : 1);           
   }
 
-  public static class PageViewMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+  public static class ReferralsMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     private Pattern pattern = Pattern
         .compile("([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*) ([^ \"]*|\"[^\"]*\") ([^ \"]*|\"[^\"]*\")");
 
-    private Text emptyValue = new Text();
-    private IntWritable one = new IntWritable(1);
+    private Text outKey = new Text();
+    private Text one = new Text("1");
 
     @Override
     public void map(LongWritable key, Text value, Context context) throws java.io.IOException,
@@ -52,10 +52,21 @@ public class Referrals {
       Matcher matcher = pattern.matcher(line);
       if (matcher.matches()) {
         if (matcher.groupCount() >= 9) {
-          String bytes = matcher.group(7);
+          String location = matcher.group(5);
+          if (location.contains("ctp080113") || location.contains("popwin_js")) {
+            return;
+          }
+          String referral = matcher.group(8);
           try {
-            one.set(Integer.parseInt(bytes));
-            context.write(emptyValue, one);
+            String url = referral.substring(1, referral.length() - 2);
+            if ("-".equals(url)) {
+              outKey.set("-");
+            } else {
+              URL url1 = new URL(url);
+              String domain = url1.getHost();
+              outKey.set(domain);
+            }
+            context.write(outKey, one);
           } catch (NumberFormatException e) {
           }
         }
@@ -63,20 +74,21 @@ public class Referrals {
     }
   }
 
-  public static class PageViewReducer extends Reducer<Text, IntWritable, Text, Text> {
+  public static class ReferralsReducer extends Reducer<Text, Text, Text, Text> {
 
-    private Text emptyText = new Text();
+    private Text outKey = new Text();
     private int totalView = 0;
     
     @Override
-    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+    public void reduce(Text key, Iterable<Text> values, Context context)
         throws java.io.IOException, InterruptedException {
-      Iterator<IntWritable> iter = values.iterator();
+      totalView = 0;
+      Iterator<Text> iter = values.iterator();
       while (iter.hasNext()) {
-        IntWritable t = iter.next();
-        totalView += t.get();
+        totalView++;
       }
-      context.write(emptyText, new Text("" + totalView));
+      outKey.set(key);
+      context.write(outKey, new Text("" + totalView));
       System.out.println(totalView);
     }
   }
