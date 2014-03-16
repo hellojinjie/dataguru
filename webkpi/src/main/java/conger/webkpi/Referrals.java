@@ -57,18 +57,17 @@ public class Referrals {
             return;
           }
           String referral = matcher.group(8);
+          String url = referral.substring(1, referral.length() - 2);
           try {
-            String url = referral.substring(1, referral.length() - 2);
-            if ("-".equals(url)) {
-              outKey.set("-");
-            } else {
-              URL url1 = new URL(url);
-              String domain = url1.getHost();
-              outKey.set(domain);
-            }
-            context.write(outKey, one);
-          } catch (NumberFormatException e) {
+            URL url1 = new URL(url);
+            String domain = url1.getHost();
+            outKey.set(domain);
+          } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(url);
+            outKey.set(url);
           }
+          context.write(outKey, one);
         }
       }
     }
