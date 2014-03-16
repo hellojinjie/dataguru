@@ -64,7 +64,7 @@ public class BytesLoaded {
   public static class PageViewReducer extends Reducer<Text, Text, Text, Text> {
 
     private Text emptyText = new Text();
-    private int totalView = 0;
+    private long totalView = 0;
     
     @Override
     public void reduce(Text key, Iterable<Text> values, Context context)
