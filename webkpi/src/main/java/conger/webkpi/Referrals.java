@@ -25,7 +25,7 @@ public class Referrals {
       System.err.println("Usage: pageview <in> <out>");
       System.exit(2);
     }
-    Job job = Job.getInstance(conf, "page view");
+    Job job = Job.getInstance(conf, "referral");
     job.setJarByClass(Referrals.class);
     job.setMapperClass(ReferralsMapper.class);
     job.setReducerClass(ReferralsReducer.class);
@@ -57,8 +57,10 @@ public class Referrals {
             return;
           }
           String referral = matcher.group(8);
+          String url = "";
           try {
-            String url = referral.substring(1, referral.length() - 2);
+            url = referral.substring(1, referral.length() - 1);
+            System.out.println(url);
             if ("-".equals(url)) {
               outKey.set("-");
             } else {
@@ -67,7 +69,9 @@ public class Referrals {
               outKey.set(domain);
             }
             context.write(outKey, one);
-          } catch (NumberFormatException e) {
+          } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(url);
           }
         }
       }
@@ -85,6 +89,7 @@ public class Referrals {
       totalView = 0;
       Iterator<Text> iter = values.iterator();
       while (iter.hasNext()) {
+        iter.next();
         totalView++;
       }
       outKey.set(key);
