@@ -1,5 +1,8 @@
 package conger.webkpi;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +13,8 @@ import net.sf.uadetector.service.UADetectorServiceFactory;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -64,7 +68,7 @@ public class IndependentIP {
           }
         }
         ip.set(matcher.group(1));
-        context.write(ip, emptyValue);
+        context.write(emptyValue, ip);
       }
     }
   }
@@ -72,11 +76,18 @@ public class IndependentIP {
   public static class IndependentIPReducer extends Reducer<Text, Text, Text, Text> {
 
     private Text emptyText = new Text();
-
+    private Set<String> ips = new HashSet<String>();
+    
     @Override
     public void reduce(Text key, Iterable<Text> values, Context context)
         throws java.io.IOException, InterruptedException {
-      context.write(key, emptyText);
+      Iterator<Text> iter = values.iterator();
+      while (iter.hasNext()) {
+        Text t = iter.next();
+        ips.add(t.toString());
+      }
+      context.write(emptyText, new Text("" + ips.size()));
+      System.out.println(ips.size());
     }
   }
 }
