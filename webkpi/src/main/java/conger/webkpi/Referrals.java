@@ -25,7 +25,7 @@ public class Referrals {
       System.err.println("Usage: pageview <in> <out>");
       System.exit(2);
     }
-    Job job = Job.getInstance(conf, "page view");
+    Job job = Job.getInstance(conf, "referral");
     job.setJarByClass(Referrals.class);
     job.setMapperClass(ReferralsMapper.class);
     job.setReducerClass(ReferralsReducer.class);
@@ -84,6 +84,7 @@ public class Referrals {
       totalView = 0;
       Iterator<Text> iter = values.iterator();
       while (iter.hasNext()) {
+        iter.next();
         totalView++;
       }
       outKey.set(key);

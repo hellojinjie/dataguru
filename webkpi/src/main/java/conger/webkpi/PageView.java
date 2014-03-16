@@ -89,6 +89,7 @@ public class PageView {
         throws java.io.IOException, InterruptedException {
       Iterator<Text> iter = values.iterator();
       while (iter.hasNext()) {
+        iter.next();
         totalView++;
       }
       context.write(emptyText, new Text("" + totalView));
