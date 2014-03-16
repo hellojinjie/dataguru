@@ -10,7 +10,7 @@ import net.sf.uadetector.service.UADetectorServiceFactory;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -39,7 +39,7 @@ public class IndependentIP {
     System.exit(job.waitForCompletion(true) ? 0 : 1);           
   }
 
-  public static class IndependentIPMapper extends Mapper<Text, Text, Text, Text> {
+  public static class IndependentIPMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     private Pattern pattern = Pattern
         .compile("([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*) ([^ \"]*|\"[^\"]*\") ([^ \"]*|\"[^\"]*\")");
@@ -50,7 +50,7 @@ public class IndependentIP {
     private Text emptyValue = new Text();
 
     @Override
-    public void map(Text key, Text value, Context context) throws java.io.IOException,
+    public void map(LongWritable key, Text value, Context context) throws java.io.IOException,
         InterruptedException {
       String line = value.toString();
       Matcher matcher = pattern.matcher(line);
