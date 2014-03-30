@@ -188,6 +188,7 @@ public class BaseStationDataPreprocess extends Configured implements Tool {
     conf.set("date", args[2]);
     conf.set("timepoint", args[3]);
 
+    @SuppressWarnings("deprecation")
     Job job = new Job(conf, "BaseStationDataPreprocess");
     job.setJarByClass(BaseStationDataPreprocess.class);
 
