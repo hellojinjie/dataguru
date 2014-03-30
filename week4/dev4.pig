@@ -2,7 +2,7 @@
 data =LOAD '/user/qos/dataguru/lbs.data' USING PigStorage('|') AS (imsi:chararray,time:chararray,loc:chararray);
 
 --注册 jars
-REGISTER piggybank.jar;
+REGISTER piggybank-0.12.0.jar;
 REGISTER joda-time-1.6.jar;
 REGISTER datafu-1.0.0.jar;
 
